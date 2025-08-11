@@ -1,115 +1,112 @@
 /**
- * @fileoverview Defines the Brick class for the BREAKOUT.EXE game, now with image textures.
- * This version of the Brick class uses an array of images to represent different
- * damage states, providing a more dynamic visual experience.
+ * @fileoverview Defines the Brick class for the BREAKOUT.EXE game, updated with user-provided sprite sheet data.
+ * This version uses a single image file for all brick textures to improve performance. The `MATERIALS` object
+ * has been updated with the coordinates and dimensions from the user's sprite map.
  */
 
-// We'll create a simple helper class to pre-load images.
-// This is a best practice to avoid performance issues during gameplay.
+// We'll create a simple helper class to pre-load a single sprite sheet.
 class ImageLoader {
     constructor() {
-        this.images = {};
-        this.loadedCount = 0;
-        this.totalCount = 0;
+        this.spriteSheet = null;
+        this.isLoaded = false;
     }
 
     /**
-     * Loads a single image.
-     * @param {string} name The name to store the image under.
-     * @param {string} url The URL path to the image file.
+     * Loads the single sprite sheet image.
+     * @param {string} url The URL path to the sprite sheet file.
      * @returns {Promise<void>} A promise that resolves when the image is loaded.
      */
-    loadImage(name, url) {
+    loadImage(url) {
         return new Promise((resolve, reject) => {
-            this.totalCount++;
-            const img = new Image();
-            img.onload = () => {
-                this.images[name] = img;
-                this.loadedCount++;
+            this.spriteSheet = new Image();
+            this.spriteSheet.onload = () => {
+                this.isLoaded = true;
+                console.log('Sprite sheet loaded successfully.');
                 resolve();
             };
-            img.onerror = () => {
-                console.error(`Failed to load image: ${url}`);
-                this.loadedCount++;
+            this.spriteSheet.onerror = () => {
+                console.error(`Failed to load sprite sheet: ${url}`);
                 reject(new Error(`Failed to load image at ${url}`));
             };
-            img.src = url;
+            this.spriteSheet.src = url;
         });
-    }
-
-    /**
-     * Checks if all images have been loaded.
-     * @returns {boolean} True if all images are loaded, false otherwise.
-     */
-    isDone() {
-        return this.loadedCount === this.totalCount;
-    }
-
-    /**
-     * Gets a loaded image by its name.
-     * @param {string} name The name of the image.
-     * @returns {HTMLImageElement|undefined} The loaded image or undefined.
-     */
-    getImage(name) {
-        return this.images[name];
     }
 }
 
 
 class Brick {
     /**
-     * Defines the different material types and their corresponding hit points and image paths.
-     * These constants are used to initialize a new brick.
+     * Defines the different material types, their hit points, and the sprite sheet coordinates
+     * provided by the user.
+     * The values for 'x', 'y', 'width', and 'height' define the location of the texture
+     * within the single sprite sheet image.
      */
     static MATERIALS = {
-        // Paths to images for each damage state
-        GLASS: { 
-            health: 1, 
-            images: [
-                './assets/images/glass_brick.png' // Image for glass brick
+        // --- Core Bricks ---
+        UNBREAKABLE: { // Using the Metal/Gray smooth block (Index 1)
+            health: Infinity,
+            sprites: [{ x: 1, y: 1, width: 24, height: 10 }]
+        },
+        WOOD: { // Using Dark wood plank (Index 2) and Light wood plank (Index 3)
+            health: 2,
+            sprites: [
+                { x: 27, y: 1, width: 24, height: 10 }, // Full health
+                { x: 53, y: 1, width: 24, height: 10 }  // Cracked state
             ]
         },
-        WOOD: { 
-            health: 2, 
-            images: [
-                './assets/images/wood_brick_full.png', // Image for full health
-                './assets/images/wood_brick_cracked.png' // Image after one hit
+        CRYSTAL: { // Using the Purple crystal blocks (Index 4, 5) and (Index 9, 10)
+            health: 2,
+            sprites: [
+                { x: 79, y: 1, width: 24, height: 10 }, // Full health (smooth)
+                { x: 105, y: 1, width: 24, height: 10 }  // Damaged state (patterned)
             ]
         },
-        CONCRETE: { 
-            health: 3, 
-            images: [
-                './assets/images/concrete_brick_full.png', // Image for full health
-                './assets/images/concrete_brick_chipped.png', // After one hit
-                './assets/images/concrete_brick_cracked.png' // After two hits
+        FIREWALL: { // Using the Yellow-orange crack patterns (Index 6, 11, 12)
+            health: 3,
+            sprites: [
+                { x: 131, y: 1, width: 32, height: 10 }, // Full health
+                { x: 53, y: 13, width: 24, height: 10 }, // Chipped
+                { x: 79, y: 13, width: 24, height: 10 }  // Cracked
+            ]
+        },
+        MOSS: { // Using the Small green moss block (Index 7)
+            health: 1,
+            sprites: [{ x: 167, y: 1, width: 12, height: 12 }]
+        },
+        // For the Glitch Zone, using the Blue ice crack pattern (Index 13, 17, 19, 20, 22)
+        GLITCH: {
+            health: 3,
+            sprites: [
+                { x: 131, y: 15, width: 28, height: 12 }, // Full health (from user's table, index 13)
+                { x: 105, y: 25, width: 24, height: 10 }, // Medium health (index 17)
+                { x: 79, y: 37, width: 24, height: 10 }   // Low health (index 20)
             ]
         }
     };
 
     /**
      * Creates a new Brick instance.
-     * @param {number} x The x-coordinate of the brick's top-left corner.
-     * @param {number} y The y-coordinate of the brick's top-left corner.
-     * @param {number} width The width of the brick.
-     * @param {number} height The height of the brick.
-     * @param {string} material The type of material for the brick ('GLASS', 'WOOD', or 'CONCRETE').
-     * @param {ImageLoader} imageLoader An instance of the ImageLoader to get loaded images.
+     * @param {number} x The x-coordinate of the brick's top-left corner on the canvas.
+     * @param {number} y The y-coordinate of the brick's top-left corner on the canvas.
+     * @param {number} width The width of the brick on the canvas.
+     * @param {number} height The height of the brick on the canvas.
+     * @param {string} material The type of material ('UNBREAKABLE', 'WOOD', 'CRYSTAL', etc.).
+     * @param {ImageLoader} imageLoader An instance of the ImageLoader with the sprite sheet.
      */
     constructor(x, y, width, height, material, imageLoader) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        
-        // Find the material configuration based on the input string.
-        const materialConfig = Brick.MATERIALS[material.toUpperCase()] || Brick.MATERIALS.GLASS;
-        
-        this.material = materialConfig;
+
+        const materialConfig = Brick.MATERIALS[material.toUpperCase()] || Brick.MATERIALS.WOOD;
+
         this.health = materialConfig.health;
-        this.isDestroyed = false; // Flag to check if the brick is broken
-        
-        this.images = materialConfig.images.map(imagePath => imageLoader.getImage(imagePath));
-        this.imageIndex = 0; // Index of the current image to display
+        this.isDestroyed = false;
+
+        this.sprites = materialConfig.sprites;
+        this.spriteIndex = 0; // Index of the current sprite to display
+        this.spriteSheet = imageLoader.spriteSheet; // Reference to the loaded sprite sheet image
     }
 
     /**
@@ -123,27 +120,31 @@ class Brick {
                 this.isDestroyed = true;
                 return true;
             }
-            // Update the image index to show the next damage state
-            if (this.imageIndex < this.images.length - 1) {
-                this.imageIndex++;
+            if (this.spriteIndex < this.sprites.length - 1) {
+                this.spriteIndex++;
             }
         }
         return false;
     }
 
     /**
-     * Draws the brick on the specified 2D rendering context.
+     * Draws the brick on the specified 2D rendering context using the sprite sheet.
      * @param {CanvasRenderingContext2D} ctx The rendering context of the game.
      */
     draw(ctx) {
-        if (!this.isDestroyed && this.images[this.imageIndex]) {
-            // Draw the current image for the brick's health state
+        if (!this.isDestroyed && this.spriteSheet) {
+            const sprite = this.sprites[this.spriteIndex];
+            
             ctx.drawImage(
-                this.images[this.imageIndex], 
-                this.x, 
-                this.y, 
-                this.width, 
-                this.height
+                this.spriteSheet, // The image object to use
+                sprite.x,         // The x-coordinate of the top-left corner of the source rectangle
+                sprite.y,         // The y-coordinate of the top-left corner of the source rectangle
+                sprite.width,     // The width of the source rectangle
+                sprite.height,    // The height of the source rectangle
+                this.x,           // The x-coordinate of the destination rectangle on the canvas
+                this.y,           // The y-coordinate of the destination rectangle on the canvas
+                this.width,       // The width of the destination rectangle
+                this.height       // The height of the destination rectangle
             );
         }
     }
