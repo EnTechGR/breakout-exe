@@ -1,99 +1,64 @@
-/**
- * @fileoverview Defines the Paddle class for the BREAKOUT.EXE game.
- * The paddle can have three different sizes: normal, wide, and small,
- * each with a corresponding sprite on the sprite sheet.
- */
+// Paddle: bounded to board; accel smoothing for premium feel.
+export class Paddle {
+  constructor(node, game) {
+    this.node = node;
+    this.g = game;
+    this.w = 120;
+    this.h = 16;
 
-class Paddle {
-    /**
-     * Defines the different paddle sizes and their corresponding sprite sheet coordinates.
-     * These constants are used to set the paddle's visual appearance and dimensions.
-     */
-    static SIZES = {
-        NORMAL: {
-            x: 152,
-            y: 79,
-            width: 128,
-            height: 25
-        },
-        WIDE: {
-            x: 0,
-            y: 111,
-            width: 161,
-            height: 25
-        },
-        SMALL: {
-            x: 184,
-            y: 111,
-            width: 96,
-            height: 25
-        }
-    };
+    this.baseSpeed = 0.7;   // px/ms baseline
+    this.speedMul = 1.0;    // set per level
+    this.accel = 0.003;     // acceleration factor
+    this.velX = 0;
 
-    /**
-     * Creates a new Paddle instance.
-     * @param {number} x The initial x-coordinate of the paddle's top-left corner on the canvas.
-     * @param {number} y The initial y-coordinate of the paddle's top-left corner on the canvas.
-     * @param {ImageLoader} imageLoader The ImageLoader instance with the loaded sprite sheet.
-     */
-    constructor(x, y, imageLoader) {
-        this.x = x;
-        this.y = y;
-        
-        // Default to the normal paddle size on initialization
-        this.currentSize = Paddle.SIZES.NORMAL;
-        this.width = this.currentSize.width;
-        this.height = this.currentSize.height;
+    this.x = (this.g.width - this.w) / 2;
+    this.y = this.g.height - 40;
+    this._debuffUntil = 0;  // wall-clock time (ms) when debuff ends
 
-        this.spriteSheet = imageLoader.spriteSheet;
+    this.render();
+  }
+
+  setSpeedMultiplier(mul) { this.speedMul = mul; }
+
+  // Temporarily shrink width (e.g., on hazards)
+  debuffWidthFor(ms) {
+    const end = performance.now() + ms;
+    this._debuffUntil = Math.max(this._debuffUntil, end);
+  }
+
+  update(dt, input) {
+    // Handle width debuff expiry
+    if (this._debuffUntil && performance.now() > this._debuffUntil) {
+      this._debuffUntil = 0;
+      this.w = 120;
     }
 
-    /**
-     * Draws the paddle on the specified 2D rendering context using the sprite sheet.
-     * @param {CanvasRenderingContext2D} ctx The rendering context of the game.
-     */
-    draw(ctx) {
-        if (this.spriteSheet) {
-            const sprite = this.currentSize;
-            
-            ctx.drawImage(
-                this.spriteSheet, // The image object to use
-                sprite.x,         // The x-coordinate of the top-left corner of the source rectangle
-                sprite.y,         // The y-coordinate of the top-left corner of the source rectangle
-                sprite.width,     // The width of the source rectangle
-                sprite.height,    // The height of the source rectangle
-                this.x,           // The x-coordinate of the destination rectangle on the canvas
-                this.y,           // The y-coordinate of the destination rectangle on the canvas
-                this.width,       // The width of the destination rectangle
-                this.height       // The height of the destination rectangle
-            );
-        }
-    }
-    
-    /**
-     * Sets the paddle's size to the normal dimensions.
-     */
-    setToNormal() {
-        this.currentSize = Paddle.SIZES.NORMAL;
-        this.width = this.currentSize.width;
-        this.height = this.currentSize.height;
-    }
+    const invert = input.inverted ? -1 : 1;
+    const target = invert * ((input.left ? -1 : 0) + (input.right ? 1 : 0));
+    const maxV = this.baseSpeed * this.speedMul;
 
-    /**
-     * Sets the paddle's size to the wide dimensions, typically for a bonus.
-     */
-    setToWide() {
-        this.currentSize = Paddle.SIZES.WIDE;
-        this.width = this.currentSize.width;
-        this.height = this.currentSize.height;
-    }
+    const want = target * maxV;
+    const sign = Math.sign(want - this.velX);
+    const deltaV = this.accel * dt * 60;
+    if (Math.abs(want - this.velX) <= deltaV) this.velX = want;
+    else this.velX += deltaV * sign;
 
-    /**
-     * Sets the paddle's size to the small dimensions, typically for a penalty.
-     */
-    setToSmall() {
-        this.currentSize = Paddle.SIZES.SMALL;
-        this.width = this.currentSize.width;
-        this.height = this.currentSize.height;
+    if (this.velX !== 0) {
+      this.x += this.velX * dt;
+      this.clamp();
+      this.render();
     }
+  }
+
+  clamp() {
+    this.x = Math.max(0, Math.min(this.x, this.g.width - this.w));
+    this.y = this.g.height - 40;
+  }
+
+  render() {
+    this.node.style.width = this.w + 'px';
+    this.node.style.transform = `translate3d(${this.x}px, ${this.y}px, 0)`;
+  }
+
+  rect() { return { x: this.x, y: this.y, w: this.w, h: this.h }; }
 }
