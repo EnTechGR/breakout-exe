@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+#gameScreen {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    border: 2px solid #16213e;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    
+    /* Background image */
+    background-image: url('assets/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    /* Fallback gradient background */
+    background-color: linear-gradient(180deg, #0f0f23 0%, #16213e 50%, #0f3460 100%);
+}
