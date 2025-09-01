@@ -27,3 +27,26 @@ body {
     /* Fallback gradient background */
     background-color: linear-gradient(180deg, #0f0f23 0%, #16213e 50%, #0f3460 100%);
 }
+
+/* Paddle Styles */
+#paddle {
+    position: absolute;
+    background-color: #ffffff;
+    border: 2px solid #cccccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    height: 15px;
+    transition: width 0.2s ease;
+}
+
+#paddle.small {
+    width: 60px;
+}
+
+#paddle.normal {
+    width: 100px;
+}
+
+#paddle.big {
+    width: 140px;
+}

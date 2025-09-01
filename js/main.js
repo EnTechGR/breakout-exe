@@ -1,4 +1,5 @@
 const gameScreen = document.getElementById("gameScreen");
+let paddle;
 
 function setBackgroundImage(imagePath) {
   gameScreen.style.backgroundImage = `url(${imagePath})`;
@@ -28,5 +29,9 @@ function gameLoop(currentTime) {
 window.addEventListener("load", () => {
   console.log("Arkanoid Game - DOM-based version loaded");
   console.log("Game screen size: 800x600 pixels");
+  
+  paddle = new Paddle(gameScreen);
+  console.log("Paddle initialized - try paddle.setState('small') or paddle.setState('big')");
+  
   requestAnimationFrame(gameLoop);
 });
