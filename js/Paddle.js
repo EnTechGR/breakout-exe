@@ -18,6 +18,7 @@ class Paddle {
         this.currentState = this.states.NORMAL;
         this.x = 350;
         this.y = 560;
+        this.speed = 300;
         
         this.createPaddleElement();
         this.updateSize();
@@ -54,6 +55,22 @@ class Paddle {
     
     getHeight() {
         return this.sizes[this.currentState].height;
+    }
+    
+    update(deltaTime, inputHandler) {
+        const deltaSeconds = deltaTime / 1000;
+        
+        if (inputHandler.isLeftPressed()) {
+            this.x -= this.speed * deltaSeconds;
+        }
+        
+        if (inputHandler.isRightPressed()) {
+            this.x += this.speed * deltaSeconds;
+        }
+        
+        this.x = Math.max(0, Math.min(this.x, 796 - this.getWidth()));
+        
+        this.updatePosition();
     }
     
     getBounds() {
