@@ -71,11 +71,11 @@ class Paddle {
   }
 
   getWidth() {
-    return this.sizes[this.currentState].width;
+    return this.spritePositions[this.currentState].width;
   }
 
   getHeight() {
-    return this.sizes[this.currentState].height;
+    return this.spritePositions[this.currentState].height;
   }
 
   update(deltaTime, inputHandler) {
