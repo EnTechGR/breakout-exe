@@ -1,31 +1,15 @@
 class Paddle {
-  constructor(gameScreen) {
-    this.gameScreen = gameScreen;
+  constructor() {
     this.element = null;
-
-    this.states = {
-      SMALL: "small",
-      NORMAL: "normal",
-      BIG: "big",
-    };
-
-    this.sizes = {
-      small: { width: 60, height: 15 },
-      normal: { width: 100, height: 15 },
-      big: { width: 140, height: 15 },
-    };
+    this.gameScreenWidth = GAME_CONSTANTS.SCREEN_WIDTH;
 
     // Sprite positions for different paddle sizes (from sprite sheet bottom row)
-    this.spritePositions = {
-      small: { x: 192, y: 116, width: 80, height: 16 },
-      normal: { x: 160, y: 84, width: 112, height: 16 },
-      big: { x: 4, y: 116, width: 154, height: 16 },
-    };
+    this.spritePositions = GAME_CONSTANTS.PADDLE_SPRITE_POSITIONS;
 
-    this.currentState = this.states.NORMAL;
-    this.x = 350;
-    this.y = 560;
-    this.speed = 300;
+    this.currentState = GAME_CONSTANTS.PADDLE_STATES.NORMAL;
+    this.x = GAME_CONSTANTS.PADDLE_DEFAULT_POSITION.X;
+    this.y = GAME_CONSTANTS.PADDLE_DEFAULT_POSITION.Y;
+    this.speed = GAME_CONSTANTS.PADDLE_SPEEDS.DEFAULT;
 
     this.createPaddleElement();
     this.updateSize();
@@ -36,17 +20,18 @@ class Paddle {
     this.element.id = "paddle";
     this.element.className = this.currentState;
 
+    // Set positioning
+    this.element.style.position = "absolute";
+
     // Set up sprite background
-    this.element.style.backgroundImage = "url(assets/BasicArkanoidPack.png)";
+    this.element.style.backgroundImage = `url(${GAME_CONSTANTS.ASSETS.SPRITE_SHEET})`;
     this.element.style.backgroundRepeat = "no-repeat";
     this.element.style.imageRendering = "pixelated";
-
-    this.gameScreen.appendChild(this.element);
   }
 
   setState(newState) {
-    if (this.states[newState.toUpperCase()]) {
-      this.currentState = this.states[newState.toUpperCase()];
+    if (GAME_CONSTANTS.PADDLE_STATES[newState.toUpperCase()]) {
+      this.currentState = GAME_CONSTANTS.PADDLE_STATES[newState.toUpperCase()];
       this.element.className = this.currentState;
       this.updateSize();
     }
@@ -89,9 +74,13 @@ class Paddle {
       this.x += this.speed * deltaSeconds;
     }
 
-    this.x = Math.max(0, Math.min(this.x, 796 - this.getWidth()));
+    this.x = Math.max(0, Math.min(this.x, this.gameScreenWidth - this.getWidth()));
 
     this.updatePosition();
+  }
+
+  setGameScreenWidth(width) {
+    this.gameScreenWidth = width;
   }
 
   getBounds() {
