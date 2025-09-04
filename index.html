@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Arkanoid Game</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div id="gameScreen">
-        <!-- Game objects will be positioned absolutely within this container -->
-    </div>
-    
+    <link rel="stylesheet" href="style.css" />
+    <script src="js/constants.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/GameScreen.js"></script>
     <script src="js/Game.js"></script>
     <script src="js/Paddle.js"></script>
     <script src="js/Ball.js"></script>
@@ -21,5 +17,11 @@
     <script src="js/StoryManager.js"></script>
     <script src="js/Boss.js"></script>
     <script src="js/UI.js"></script>
-</body>
+  </head>
+  <body>
+    <div id="gameScreen">
+      <img src="assets/background.jpg" alt="Game Background" id="backgroundImage">
+      <!-- Game objects will be positioned absolutely within this container -->
+    </div>
+  </body>
 </html>
