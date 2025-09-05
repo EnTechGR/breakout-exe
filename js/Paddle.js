@@ -38,7 +38,7 @@ class Paddle {
   }
 
   updateSize() {
-    const sprite = this.spritePositions[this.currentState];
+    const sprite = this.spritePositions[this.currentState.toUpperCase()];
 
     // Set element dimensions
     this.element.style.width = sprite.width + "px";
@@ -56,11 +56,11 @@ class Paddle {
   }
 
   getWidth() {
-    return this.spritePositions[this.currentState].width;
+    return this.spritePositions[this.currentState.toUpperCase()].width;
   }
 
   getHeight() {
-    return this.spritePositions[this.currentState].height;
+    return this.spritePositions[this.currentState.toUpperCase()].height;
   }
 
   update(deltaTime, inputHandler) {
