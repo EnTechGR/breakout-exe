@@ -91,4 +91,8 @@ class Paddle {
       bottom: this.y + this.getHeight(),
     };
   }
+
+  getCenterX() {
+    return this.x + this.getWidth() / 2;
+  }
 }
