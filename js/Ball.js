@@ -3,7 +3,7 @@ class Ball {
     this.element = null;
     this.x = GAME_CONSTANTS.BALL_DEFAULT_POSITION.X;
     this.y = GAME_CONSTANTS.BALL_DEFAULT_POSITION.Y;
-    this.vx = GAME_CONSTANTS.BALL_DEFAULT_VELOCITY.X;
+    this.vx = Math.random() > 0.5 ? GAME_CONSTANTS.BALL_DEFAULT_VELOCITY.X : -GAME_CONSTANTS.BALL_DEFAULT_VELOCITY.X;
     this.vy = GAME_CONSTANTS.BALL_DEFAULT_VELOCITY.Y;
     this.size = GAME_CONSTANTS.BALL_SIZE;
     this.gameScreenWidth = GAME_CONSTANTS.SCREEN_WIDTH;
@@ -91,7 +91,7 @@ class Ball {
   reset() {
     this.x = GAME_CONSTANTS.BALL_DEFAULT_POSITION.X;
     this.y = GAME_CONSTANTS.BALL_DEFAULT_POSITION.Y;
-    this.vx = GAME_CONSTANTS.BALL_DEFAULT_VELOCITY.X;
+    this.vx = Math.random() > 0.5 ? GAME_CONSTANTS.BALL_DEFAULT_VELOCITY.X : -GAME_CONSTANTS.BALL_DEFAULT_VELOCITY.X;
     this.vy = GAME_CONSTANTS.BALL_DEFAULT_VELOCITY.Y;
     this.updatePosition();
   }
@@ -112,5 +112,11 @@ class Ball {
   setGameScreenDimensions(width, height) {
     this.gameScreenWidth = width;
     this.gameScreenHeight = height;
+  }
+
+  positionOnPaddle(paddle) {
+    this.x = paddle.getCenterX() - this.size / 2;
+    this.y = paddle.getBounds().top - this.size;
+    this.updatePosition();
   }
 }
