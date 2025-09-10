@@ -88,12 +88,16 @@ class Ball {
     }
   }
 
-  reset() {
-    this.x = GAME_CONSTANTS.BALL_DEFAULT_POSITION.X;
-    this.y = GAME_CONSTANTS.BALL_DEFAULT_POSITION.Y;
+  reset(paddle) {
     this.vx = Math.random() > 0.5 ? GAME_CONSTANTS.BALL_DEFAULT_VELOCITY.X : -GAME_CONSTANTS.BALL_DEFAULT_VELOCITY.X;
     this.vy = GAME_CONSTANTS.BALL_DEFAULT_VELOCITY.Y;
-    this.updatePosition();
+    if (paddle) {
+      this.positionOnPaddle(paddle);
+    } else {
+      this.x = GAME_CONSTANTS.BALL_DEFAULT_POSITION.X;
+      this.y = GAME_CONSTANTS.BALL_DEFAULT_POSITION.Y;
+      this.updatePosition();
+    }
   }
 
   getBounds() {
