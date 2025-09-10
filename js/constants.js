@@ -25,15 +25,11 @@ const GAME_CONSTANTS = {
 
   // Ball
   BALL_SIZE: 20,
-  BALL_DEFAULT_POSITION: {
-    X: 400,
-    Y: 300,
-  },
   BALL_DEFAULT_VELOCITY: {
     X: 200,
     Y: -200,
   },
-  BALL_SPRITE_POSITION: { x: 2, y: 82, width: 20, height: 20 },
+  BALL_SPRITE_POSITION: { x: 2, y: 82 },
 
   // Assets
   ASSETS: {
@@ -42,6 +38,26 @@ const GAME_CONSTANTS = {
 
   // Game Loop
   FPS_LOG_INTERVAL: 60,
+
+  // Bricks
+  BRICK_WIDTH: 70,
+  BRICK_HEIGHT: 32,
+  BRICK_ROWS: 8,
+  BRICK_COLS: 10,
+  BRICK_PADDING: 3,
+  BRICK_OFFSET_TOP: 20,
+  BRICK_OFFSET_LEFT: 35,
+
+  BRICK_COLORS: [
+    { sprite: { x: 0, y: 0 } }, // Orange
+    { sprite: { x: 72, y: 0 } }, // Red
+    { sprite: { x: 144, y: 0 } }, // Green
+    { sprite: { x: 216, y: 0 } }, // Blue
+    { sprite: { x: 0, y: 40 } }, // Pink
+    { sprite: { x: 72, y: 40 } }, // Cyan
+    { sprite: { x: 144, y: 40 } }, // Yellow
+    { sprite: { x: 216, y: 40 } }, // Purple
+  ],
 
   // States
   PADDLE_STATES: {
