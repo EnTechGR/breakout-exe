@@ -1,12 +1,17 @@
 class InputHandler {
     constructor() {
         this.keys = {};
+        this.keyJustPressed = {};
         this.setupEventListeners();
     }
     
     setupEventListeners() {
         document.addEventListener('keydown', (e) => {
-            this.keys[e.key.toLowerCase()] = true;
+            const key = e.key.toLowerCase();
+            if (!this.keys[key]) {
+                this.keyJustPressed[key] = true;
+            }
+            this.keys[key] = true;
             e.preventDefault();
         });
         
@@ -26,5 +31,17 @@ class InputHandler {
     
     isRightPressed() {
         return this.isKeyPressed('arrowright') || this.isKeyPressed('d');
+    }
+    
+    wasKeyJustPressed(key) {
+        return !!this.keyJustPressed[key.toLowerCase()];
+    }
+    
+    isEscapeJustPressed() {
+        return this.wasKeyJustPressed('escape');
+    }
+    
+    clearJustPressed() {
+        this.keyJustPressed = {};
     }
 }

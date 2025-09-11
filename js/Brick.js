@@ -128,4 +128,12 @@ class BrickManager {
     });
     this.createBricks();
   }
+
+  areAllBricksDestroyed() {
+    return this.bricks.every(brick => brick.isDestroyed);
+  }
+
+  getRemainingBricksCount() {
+    return this.bricks.filter(brick => !brick.isDestroyed).length;
+  }
 }
