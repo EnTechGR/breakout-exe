@@ -36,11 +36,11 @@ class Menu {
     title.style.fontSize = "36px";
     title.style.textShadow = "2px 2px 4px rgba(0,0,0,0.8)";
     
-    const resumeButton = document.createElement("button");
-    resumeButton.textContent = "Resume (ESC)";
-    resumeButton.className = "menu-button";
-    this.styleButton(resumeButton);
-    resumeButton.addEventListener("click", () => this.resume());
+    this.resumeButton = document.createElement("button");
+    this.resumeButton.textContent = "Resume (ESC)";
+    this.resumeButton.className = "menu-button";
+    this.styleButton(this.resumeButton);
+    this.resumeButton.addEventListener("click", () => this.resume());
     
     const restartButton = document.createElement("button");
     restartButton.textContent = "Restart";
@@ -57,7 +57,7 @@ class Menu {
     `;
     
     this.element.appendChild(title);
-    this.element.appendChild(resumeButton);
+    this.element.appendChild(this.resumeButton);
     this.element.appendChild(restartButton);
     this.element.appendChild(instructions);
   }
@@ -90,10 +90,13 @@ class Menu {
     const title = this.element.querySelector("h2");
     if (type === 'gameOver') {
       title.textContent = "GAME OVER";
+      this.resumeButton.style.display = "none";
     } else if (type === 'levelComplete') {
       title.textContent = "LEVEL COMPLETE";
+      this.resumeButton.style.display = "none";
     } else {
       title.textContent = "PAUSED";
+      this.resumeButton.style.display = "block";
     }
   }
 
